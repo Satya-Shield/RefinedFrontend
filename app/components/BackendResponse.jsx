@@ -1,0 +1,259 @@
+import React, { useState, useEffect } from "react";
+import { 
+    FaCheckCircle, 
+    FaTimesCircle, 
+    FaExclamationTriangle, 
+    FaBrain, 
+    FaBolt, 
+    FaShieldAlt, 
+    FaExternalLinkAlt,
+    FaCogs,
+    FaArrowLeft,
+    FaArrowRight
+} from 'react-icons/fa';
+
+const BackendResponse = ({ jsonResponse }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [confidenceBar, setConfidenceBar] = useState(0);
+
+    if (!jsonResponse || jsonResponse.length === 0) {
+        return null;
+    }
+
+    const getColorScheme = (response) => {
+        if (!response) return null;
+
+        if (response.verdict === "True" && response.confidence >= 60) {
+            return {
+                gradient: 'from-emerald-500/20 to-green-500/10',
+                border: 'border-emerald-500/30',
+                icon: FaCheckCircle,
+                accentBg: 'bg-emerald-500/10',
+                accentBorder: 'border-emerald-500/20',
+                textAccent: 'text-emerald-400',
+                progressBg: 'bg-emerald-500',
+            };
+        } else if (response.verdict === "False" && response.confidence >= 60) {
+            return {
+                gradient: 'from-red-500/20 to-rose-500/10',
+                border: 'border-red-500/30',
+                icon: FaTimesCircle,
+                accentBg: 'bg-red-500/10',
+                accentBorder: 'border-red-500/20',
+                textAccent: 'text-red-400',
+                progressBg: 'bg-red-500',
+            };
+        } else {
+            return {
+                gradient: 'from-amber-500/20 to-yellow-500/10',
+                border: 'border-amber-500/30',
+                icon: FaExclamationTriangle,
+                accentBg: 'bg-amber-500/10',
+                accentBorder: 'border-amber-500/20',
+                textAccent: 'text-amber-400',
+                progressBg: 'bg-amber-500',
+            };
+        }
+    };
+
+    useEffect(() => {
+        if (jsonResponse[currentIndex]) {
+            setConfidenceBar(0);
+            const timer = setTimeout(() => {
+                setConfidenceBar(jsonResponse[currentIndex].confidence);
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [jsonResponse, currentIndex]);
+
+    const handlePrev = () => {
+        setCurrentIndex((prev) =>
+            prev === 0 ? jsonResponse.length - 1 : prev - 1
+        );
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) =>
+            prev === jsonResponse.length - 1 ? 0 : prev + 1
+        );
+    };
+
+    const response = jsonResponse[currentIndex];
+    const colorScheme = getColorScheme(response);
+    const IconComponent = colorScheme.icon;
+    const techniques = response.techniques || [];
+    const sources = response.sources || [];
+    const checklist = response.checklist || [];
+
+    return (
+        <div className="relative flex flex-col items-center w-full max-w-3xl mx-auto h-[calc(100vh-8rem)]">
+            {/* Navigation Controls - Fixed at top */}
+            {jsonResponse.length > 1 && (
+                <div className="flex items-center justify-between w-full mb-4 px-4 flex-shrink-0">
+                    <button
+                        onClick={handlePrev}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-600/50 rounded-lg text-gray-300 transition-colors duration-200"
+                    >
+                        <FaArrowLeft className="w-4 h-4" />
+                        <span>Previous</span>
+                    </button>
+                    
+                    <div className="text-gray-400 text-sm">
+                        {currentIndex + 1} / {jsonResponse.length}
+                    </div>
+                    
+                    <button
+                        onClick={handleNext}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-600/50 rounded-lg text-gray-300 transition-colors duration-200"
+                    >
+                        <span>Next</span>
+                        <FaArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+
+            {/* Scrollable Response Card Container */}
+            <div className="w-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800/50">
+                {/* Response Card */}
+                <div 
+                    className={`${colorScheme.border} relative p-4 rounded-2xl border-gray-700 bg-gray-900/60 backdrop-blur-lg shadow-lg w-full`}
+                >
+                    <div className="relative space-y-4">
+                        <div className="flex items-center gap-2">
+                            <FaBolt className="w-4 h-4 text-blue-400" />
+                            <h3 className="text-sm uppercase tracking-wider text-blue-400">Claim To Check</h3>
+                        </div>
+
+                        {/* Claim */}
+                        <div className={`${colorScheme.accentBg} ${colorScheme.accentBorder} border rounded-xl p-6 backdrop-blur-sm`}>
+                            <p className="text-white leading-relaxed text-lg">
+                                "{response.claim}"
+                            </p>
+                        </div>
+
+                        {/* Verdict & Confidence */}
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FaShieldAlt className="w-4 h-4 text-gray-400" />
+                                    <h4 className="text-sm uppercase tracking-wider text-gray-400">Verdict</h4>
+                                </div>
+                                <div className={`${colorScheme.accentBg} ${colorScheme.accentBorder} border rounded-xl p-4 backdrop-blur-sm`}>
+                                    <div className="flex items-center gap-3">
+                                        <IconComponent className={`w-6 h-6 ${colorScheme.textAccent}`} />
+                                        <span className={`text-xl font-medium ${colorScheme.textAccent}`}>
+                                            {response.verdict}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FaBolt className="w-4 h-4 text-gray-400" />
+                                    <h4 className="text-sm uppercase tracking-wider text-gray-400">Confidence Level</h4>
+                                </div>
+                                <div className={`${colorScheme.accentBg} ${colorScheme.accentBorder} border rounded-xl p-4 backdrop-blur-sm`}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className={`text-2xl font-bold ${colorScheme.textAccent}`}>{confidenceBar}%</span>
+                                        <span className="text-sm text-gray-400">Certainty</span>
+                                    </div>
+                                    <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                                        <div 
+                                            className={`${colorScheme.progressBg} h-2 rounded-full transition-all duration-700`} 
+                                            style={{ width: `${confidenceBar}%` }} 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Techniques */}
+                        {techniques.length > 0 && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FaCogs className="w-4 h-4 text-indigo-400" />
+                                    <h4 className="text-sm uppercase tracking-wider text-indigo-400">Analysis Techniques</h4>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {techniques.map((technique, index) => (
+                                        <span
+                                            key={index}
+                                            className="px-4 py-2 bg-gray-800/80 border border-gray-600/50 text-gray-300 text-sm rounded-lg backdrop-blur-sm hover:bg-gray-700/80 transition-colors duration-200"
+                                        >
+                                            {technique}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Explanation */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                                <FaBrain className="w-4 h-4 text-purple-400" />
+                                <h4 className="text-sm uppercase tracking-wider text-purple-400">AI Analysis</h4>
+                            </div>
+                            <div className="bg-gray-800/60 border border-gray-600/50 rounded-xl p-6 backdrop-blur-sm">
+                                <p className="text-gray-300 leading-relaxed text-base">
+                                    {response.explanation}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Sources */}
+                        {sources.length > 0 && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FaExternalLinkAlt className="w-4 h-4 text-cyan-400" />
+                                    <h4 className="text-sm uppercase tracking-wider text-cyan-400">Sources</h4>
+                                </div>
+
+                                <div className="bg-gray-800/60 border border-gray-600/50 rounded-xl p-6 backdrop-blur-sm space-y-3">
+                                    {sources.map((source, index) => (
+                                        <div key={index} className="flex items-center gap-3 group">
+                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center">
+                                                <span className="text-xs text-cyan-400">{index + 1}</span>
+                                            </div>
+                                            <a
+                                                href={source}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex-1 text-gray-300 hover:text-cyan-300 transition-colors duration-200 group-hover:underline decoration-cyan-400/50 break-words"
+                                            >
+                                                {source}
+                                                <FaExternalLinkAlt className="inline w-3 h-3 ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Checklist */}
+                        {checklist.length > 0 && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FaCheckCircle className="w-4 h-4 text-emerald-400" />
+                                    <h4 className="text-sm uppercase tracking-wider text-emerald-400">Verification Checklist</h4>
+                                </div>
+                                <div className="bg-gray-800/60 border border-gray-600/50 rounded-xl p-4 backdrop-blur-sm space-y-3">
+                                    {checklist.map((item, index) => (
+                                        <div key={index} className="flex items-start gap-3">
+                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center mt-0.5">
+                                                <span className="text-xs text-cyan-400">{index + 1}</span>
+                                            </div>
+                                            <span className="text-gray-300 leading-relaxed">{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default BackendResponse;
