@@ -1,15 +1,16 @@
-"use client";
 
 import React from "react";
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import BeforeAfterSection from "./components/BeforeAfterSection";
-import SampleResponse from "./components/SampleResponse";
-import AccessMethods from "./components/AccessMethods";
-import Contributors from "./components/Contributors";
-import Features from "./components/Features";
-
-export default function Page() {
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import BeforeAfterSection from "@/components/BeforeAfterSection";
+import SampleResponse from "@/components/SampleResponse";
+import AccessMethods from "@/components/AccessMethods";
+import Contributors from "@/components/Contributors";
+import Features from "@/components/Features";
+import AuthProvider from "@/components/AuthProvider";
+import connectDB from "@/config/database";
+const Page = async() => {
+  await connectDB();
   const data = [
     {
       type : "Website",
@@ -101,7 +102,9 @@ export default function Page() {
 
       {/* Hero section content */}
       <div className="relative z-10">
-        <Navbar/>
+        <AuthProvider>
+          <Navbar/>
+        </AuthProvider>
         <Hero />
         <BeforeAfterSection />
         <SampleResponse />
@@ -112,4 +115,6 @@ export default function Page() {
       </div>
     </div>
   );
-}
+};
+
+export default Page

@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import SearchInput from "../components/SearchInput";
-import BackendResponse from "../components/BackendResponse";
-import FeatureCards from "../components/FeatureCards";
+import Navbar from "@/components/Navbar";
+import SearchInput from "@/components/SearchInput";
+import BackendResponse from "@/components/BackendResponse";
+import FeatureCards from "@/components/FeatureCards";
 import { useSearchParams } from "next/navigation"; 
 
 const Combat = () => {
