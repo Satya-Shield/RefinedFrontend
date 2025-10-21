@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+// right now doesnt matter if they logged in or not 
+// if they are we store history 
+// else we dont 
 
+
+// otherwise it kinda makes sus that why do you need my info just to check a fact
 const HistoryPage = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +16,6 @@ const HistoryPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect if user is not logged in
     if (status === 'unauthenticated') {
       router.push('/login'); // or wherever your login page is
       return;

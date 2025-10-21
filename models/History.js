@@ -1,10 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const HistorySchema = new Schema({
-  // This is the crucial link to our User model
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This tells Mongoose the ID belongs to a document in the 'User' collection
+    ref: 'User', 
     required: true,
   },
   claim: {
@@ -22,7 +21,7 @@ const HistorySchema = new Schema({
     type: String,
   },
   techniques: {
-    type: [String], // Defines an array of strings
+    type: [String], 
   },
   sources: {
     type: [String],
@@ -31,7 +30,8 @@ const HistorySchema = new Schema({
     type: [String],
   },
 }, {
-  timestamps: true, // Automatically adds `createdAt` and `updatedAt` fields
+  timestamps: true, // do we actually need these 
+  
 });
 
 const History = mongoose.models.History || mongoose.model("History", HistorySchema);
