@@ -14,7 +14,6 @@ const Navbar = () => {
     const setAuthProviders = async () => {
       try {
         const res = await getProviders();
-        console.log("Providers fetched:", res); // Debug
         setProviders(res);
       } catch (error) {
         console.error("Failed to load providers:", error);
@@ -44,14 +43,14 @@ const Navbar = () => {
         {/* Navigation Links */}
         <div className="flex items-center justify-end space-x-5">
           <span
-            className={` text-gray-800 hover:text-gray-600 transition-colors cursor-pointer ${
+            className={`text-gray-800 hover:text-gray-600 transition-colors cursor-pointer ${
               pathname === "/" ? "font-semibold" : ""
             }`}
           >
             Home
           </span>
           <span
-            className={` text-gray-800 hover:text-gray-600 transition-colors cursor-pointer ${
+            className={`text-gray-800 hover:text-gray-600 transition-colors cursor-pointer ${
               pathname === "/about" ? "font-semibold" : ""
             }`}
           >

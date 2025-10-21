@@ -1,23 +1,22 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/utils/authOptions'
+// Ye file hum nahi use karre everything managed by auth.js
 
-export const getSessionUser = async() => {
-    const session = await getServerSession(authOptions);
-    try{
-        if(!session || !session.user){
-            return null;
-        }
-        return{
-            user : session.user,
-            userId : session.user.id
-        }
-    }
-    catch(err){
-        console.log(err);
-        return null
+
+import { auth } from '@/auth';
+
+export const getSessionUser = async () => {
+  try {
+    const session = await auth();
+    
+    if (!session || !session.user) {
+      return null;
     }
     
-
-    
-
-}
+    return {
+      user: session.user,
+      userId: session.user.id
+    };
+  } catch (err) {
+    console.error('Session error:', err);
+    return null;
+  }
+};

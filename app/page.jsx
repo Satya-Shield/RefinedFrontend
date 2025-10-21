@@ -104,8 +104,9 @@ const Page = async() => {
       <div className="relative z-10">
         <AuthProvider>
           <Navbar/>
+          <Hero />
         </AuthProvider>
-        <Hero />
+
         <BeforeAfterSection />
         <SampleResponse />
         <AccessMethods data={data} />

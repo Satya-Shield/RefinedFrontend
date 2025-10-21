@@ -6,9 +6,11 @@ import SearchInput from "@/components/SearchInput";
 import BackendResponse from "@/components/BackendResponse";
 import FeatureCards from "@/components/FeatureCards";
 import { useSearchParams } from "next/navigation"; 
+import { useSession } from "next-auth/react";
 
 const Combat = () => {
   const searchParams = useSearchParams();
+  const { data : session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -40,6 +42,26 @@ const Combat = () => {
     }
   }, [searchParams]);
 
+  const saveHistory = async(respSave)=>{
+    if(!session){
+      return;
+    }
+    try{
+      await fetch('/api/history',{
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
+      body : JSON.stringify(respSave)
+    });
+      console.log('History aayi hai');
+    }catch(error){
+      console.log('Nahi save hui history')
+    }
+
+  }
+
+  
   const verifyAPI = async (query) => {
     console.log("Handling request for the basic query type");
     setLoading(true);
@@ -55,6 +77,7 @@ const Combat = () => {
       const data = await res.json();
       console.log(data);
       setJsonResponse(data);
+      await saveHistory(data);
     } catch (err) {
       console.error("Error hai code mei:", err);
       setJsonResponse([
@@ -92,6 +115,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From image verification", data);
       setJsonResponse(data);
+      await saveHistory(data);
     } catch (err) {
       console.error("From image verification", err);
       setJsonResponse([
@@ -126,6 +150,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From url results", data);
       setJsonResponse(data);
+      await saveHistory(data)
     } catch (err) {
       console.error("Error in URL verification", err);
       setJsonResponse([
