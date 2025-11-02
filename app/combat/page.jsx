@@ -7,7 +7,7 @@ import BackendResponse from "@/components/BackendResponse";
 import FeatureCards from "@/components/FeatureCards";
 import { useSearchParams } from "next/navigation"; 
 import { useSession } from "next-auth/react";
-
+import { FaShieldAlt } from "react-icons/fa";
 const Combat = () => {
   const searchParams = useSearchParams();
   const { data : session } = useSession();
@@ -86,7 +86,7 @@ const Combat = () => {
     console.log("Handling request for the basic query type");
     setLoading(true);
     try {
-      const res = await fetch("https://satyashield-backend-60le.onrender.com/api/run_agent", {
+      const res = await fetch("http://34.93.122.16:8000/api/run_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
@@ -125,7 +125,7 @@ const Combat = () => {
       formData.append("file", file);
       formData.append("query", query);
 
-      const res = await fetch("https://satyashield-backend-60ie.onrender.com/api/read_image_file", {
+      const res = await fetch("http://34.93.122.16:8000/api/read_image_file", {
         method: "POST",
         body: formData,
       });
@@ -155,11 +155,49 @@ const Combat = () => {
     }
   };
 
+  const verifyVideoAPI = async (file, query) => {
+    console.log("Handling request for the video");
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("query", query);
+
+      const res = await fetch("http://34.93.122.16:8000/api/read_video_file", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(`Error from handling image ${res.status}`);
+
+      const data = await res.json();
+      console.log("From video verification", data);
+      setJsonResponse(data);
+      await saveHistory(data);
+    } catch (err) {
+      console.error("From video verification", err);
+      setJsonResponse([
+        {
+          claim: `Video verification, ${query}`,
+          verdict: `Error`,
+          confidence: 0,
+          explanation:
+            "There has been an error from our end. We will be right back with your image verification!",
+          techniques: [],
+          sources: [],
+          checklist: [],
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const verifyImageUrlAPI = async (imageUrl, query) => {
     console.log("Sending request for the url");
     setLoading(true);
     try {
-      const res = await fetch("https://satyashield-backend-60le.onrender.com/api/read_image_url", {
+      const res = await fetch("http://34.93.122.16:8000/api/read_image_url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, image: imageUrl }),
@@ -189,6 +227,42 @@ const Combat = () => {
       setLoading(false);
     }
   };
+
+  const verifyVideoUrlAPI = async (videoUrl, query) => {
+    console.log("Sending request for the url for video");
+    setLoading(true);
+    try {
+      const res = await fetch("http://34.93.122.16:8000/api/read_video_url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, video: videoUrl }),
+      });
+
+      if (!res.ok) throw new Error(`Error from video url handling ${res.status}`);
+
+      const data = await res.json();
+      console.log("From url results", data);
+      setJsonResponse(data);
+      await saveHistory(data)
+    } catch (err) {
+      console.error("Error in video URL verification", err);
+      setJsonResponse([
+        {
+          claim: `URL verification : ${query}`,
+          verdict: `Error`,
+          confidence: 0,
+          explanation:
+            "There has been some error from our end. We will be right back with your url verification!",
+          techniques: [],
+          sources: [],
+          checklist: [],
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleSearch = (searchData) => {
     console.log("Hello from handle search");
@@ -266,7 +340,7 @@ const Combat = () => {
       <div className="relative z-10">
         <Navbar />
         <div className="w-full flex flex-col lg:flex-row lg:items-start gap-8 px-6 pt-12">
-          <div className="flex flex-col space-y-6 lg:w-1/2 mt-0">
+          <div className="flex flex-col space-y-6 flex-1 mt-0">
             <div className="-mt-20">
               <SearchInput
                 onSearch={handleSearch}
@@ -284,15 +358,16 @@ const Combat = () => {
             </div>
           </div>
 
-          <div className="flex justify-center lg:justify-start lg:w-1/2 -mt-8">
+          <div className="flex justify-center lg:justify-start flex-1">
             {jsonResponse && (
-              <div className="mt-6 w-full space-y-6">
+              <div className="-mt-8 w-full space-y-6">
                 {/* 🟩 Overall Verdict + Summary Section */}
                 {jsonResponse.verdict !== undefined && (
-                  <div className="bg-white/40 backdrop-blur-xl border border-gray-200/40 shadow-xl rounded-2xl p-5 relative w-full">
-                    {/* Top Row: Verdict + Chat Icon */}
-                    <div className="flex justify-between items-center mb-3">
-                      <h2 className="text-xl font-semibold text-gray-800">
+                  <div className="relative p-3 rounded-lg border border-[#ede8da] bg-gradient-to-b from-[#fffdf7] to-[#fef9ed] shadow-sm w-full backdrop-blur-md">
+                    {/* Top Row: Verdict */}
+                    <div className="flex items-center gap-3 mb-2">
+                      <FaShieldAlt className="text-gray-700 text-lg flex-shrink-0" />
+                      <h2 className="text-sm font-semibold text-gray-800">
                         Overall Verdict:{" "}
                         <span
                           className={`${
@@ -310,15 +385,9 @@ const Combat = () => {
                             : "Uncertain"}
                         </span>
                       </h2>
-
-                      {/* Chat More Button */}
-                      <button className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full text-sm font-medium shadow-md hover:opacity-90 transition">
-                        💬 Chat More
-                      </button>
                     </div>
-
-                    {/* Scrollable Summary Box */}
-                    <div className="bg-white/50 rounded-xl border border-gray-100/50 shadow-inner p-3 max-h-48 overflow-y-auto text-gray-700 text-sm leading-relaxed">
+                    {/* Summary Box - Shows 2 lines, rest scrollable */}
+                    <div className="bg-white/50 rounded-lg border border-gray-200/60 p-2 text-gray-700 text-xs leading-relaxed backdrop-blur-sm overflow-y-auto" style={{ maxHeight: '5rem' }}>
                       {jsonResponse.summary || "No summary available."}
                     </div>
                   </div>

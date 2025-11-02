@@ -58,7 +58,10 @@ const BackendResponse = ({ jsonResponse }) => {
         if (jsonResponse[currentIndex]) {
             setConfidenceBar(0);
             const timer = setTimeout(() => {
-                setConfidenceBar(jsonResponse[currentIndex].confidence);
+                const confidence = jsonResponse[currentIndex].confidence;
+                // Convert decimal to percentage if needed (e.g., 0.75 -> 75)
+                const confidenceValue = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+                setConfidenceBar(confidenceValue);
             }, 100);
             return () => clearTimeout(timer);
         }
@@ -84,17 +87,16 @@ const BackendResponse = ({ jsonResponse }) => {
     const checklist = response.checklist || [];
 
     return (
-        <div className="relative flex flex-col items-center w-full max-w-3xl mx-auto h-[calc(100vh-8rem)] -mt-8 px-6">
+        <div className="relative flex flex-col items-center w-full mx-auto">
             
             {/* Navigation Controls */}
             {jsonResponse.length > 1 && (
                 <div className="flex items-center justify-between w-full mb-4 px-4 flex-shrink-0">
                     <button
                         onClick={handlePrev}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
+                        className="flex items-center justify-center w-10 h-10 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
                     >
                         <FaArrowLeft className="w-4 h-4" />
-                        <span>Previous</span>
                     </button>
                     
                     <div className="text-gray-600 text-sm font-medium">
@@ -103,16 +105,15 @@ const BackendResponse = ({ jsonResponse }) => {
                     
                     <button
                         onClick={handleNext}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
+                        className="flex items-center justify-center w-10 h-10 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
                     >
-                        <span>Next</span>
                         <FaArrowRight className="w-4 h-4" />
                     </button>
                 </div>
             )}
 
-            {/* Scrollable Response Card */}
-            <div className="w-full pr-2 h-full">
+            {/* Response Card */}
+            <div className="w-full pr-2">
                 <div
                     className={`${colorScheme.border} relative p-8 rounded-3xl border 
                     bg-gradient-to-b from-[#fffdf7] to-[#fef9ed] 
