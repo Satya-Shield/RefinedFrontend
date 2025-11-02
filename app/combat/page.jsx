@@ -286,11 +286,54 @@ const Combat = () => {
 
           <div className="flex justify-center lg:justify-start lg:w-1/2 -mt-8">
             {jsonResponse && (
-              <div className="mt-6">
-                <BackendResponse jsonResponse={jsonResponse} />
+              <div className="mt-6 w-full space-y-6">
+                {/* 🟩 Overall Verdict + Summary Section */}
+                {jsonResponse.verdict !== undefined && (
+                  <div className="bg-white/40 backdrop-blur-xl border border-gray-200/40 shadow-xl rounded-2xl p-5 relative w-full">
+                    {/* Top Row: Verdict + Chat Icon */}
+                    <div className="flex justify-between items-center mb-3">
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        Overall Verdict:{" "}
+                        <span
+                          className={`${
+                            jsonResponse.verdict
+                              ? "text-green-600"
+                              : jsonResponse.verdict === false
+                              ? "text-red-600"
+                              : "text-yellow-500"
+                          }`}
+                        >
+                          {jsonResponse.verdict === true
+                            ? "True"
+                            : jsonResponse.verdict === false
+                            ? "False"
+                            : "Uncertain"}
+                        </span>
+                      </h2>
+
+                      {/* Chat More Button */}
+                      <button className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full text-sm font-medium shadow-md hover:opacity-90 transition">
+                        💬 Chat More
+                      </button>
+                    </div>
+
+                    {/* Scrollable Summary Box */}
+                    <div className="bg-white/50 rounded-xl border border-gray-100/50 shadow-inner p-3 max-h-48 overflow-y-auto text-gray-700 text-sm leading-relaxed">
+                      {jsonResponse.summary || "No summary available."}
+                    </div>
+                  </div>
+                )}
+
+                {/* 🟦 Individual Claim Responses (Existing Layout) */}
+                {jsonResponse.claims ? (
+                  <BackendResponse jsonResponse={jsonResponse.claims} />
+                ) : (
+                  <BackendResponse jsonResponse={jsonResponse} />
+                )}
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>
