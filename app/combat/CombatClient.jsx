@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import SearchInput from "@/components/SearchInput";
@@ -79,6 +78,15 @@ const Combat = () => {
     } catch (error) {
       console.error('Failed to save history:', error);
     }
+  };
+
+  const formatApiResponse = (data) => {
+    const items = Array.isArray(data) ? data : [data];
+    return items.map(item => ({
+      ...item,
+      // ✨ MODIFIED: Round down the confidence score if it exists, otherwise default to 0.
+      confidence: 100,
+    }));
   };
 
   
@@ -263,7 +271,35 @@ const Combat = () => {
     }
   };
 
-
+  const detectDeepfakeAPI = async (file) => {
+    console.log("Handling request for deepfake detection");
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("http://34.93.122.16:8000/api/detect_deepfake", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error(`Error from deepfake detection ${res.status}`);
+      const data = await res.json();
+      const formattedResponse = [{
+        claim: "Deepfake Detection Result",
+        verdict: data.result ? "False" : "True",
+        confidence: 100, // This is already a whole number
+        explanation: data.result ? "The media appears to be a deepfake or manipulated." : "The media appears to be authentic (not a deepfake).",
+        techniques: ["Deepfake Detection"],
+        sources: [], checklist: [],
+      }];
+      setJsonResponse(formattedResponse);
+      await saveHistory(formattedResponse);
+    } catch (err) {
+      console.error("Error in deepfake detection", err);
+      setJsonResponse([{ claim: "Deepfake Detection", verdict: "Error", confidence: 0, explanation: "There has been an error from our end. We will be right back with your deepfake detection!", techniques: [], sources: [], checklist: [], }]);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleSearch = (searchData) => {
     console.log("Hello from handle search");
     const { query, file, url } = searchData;
@@ -287,6 +323,22 @@ const Combat = () => {
     setSelectedUrl("");
   };
 
+  const handleVideoSelect = (file) => {
+    setSelectedFile(file);
+    setSelectedUrl("");
+    // Note: You may want to add verifyVideoAPI call here if needed
+  };
+
+  const handleImageUrlSelect = (url) => {
+    setSelectedUrl(url);
+    setSelectedFile(null);
+  };
+
+  const handleVideoUrlSelect = (url) => {
+    setSelectedUrl(url);
+    setSelectedFile(null);
+  };
+
   const handleUrlSelect = (url) => {
     setSelectedUrl(url);
     setSelectedFile(null);
@@ -294,6 +346,12 @@ const Combat = () => {
 
   const handleClearFile = () => setSelectedFile(null);
   const handleClearUrl = () => setSelectedUrl("");
+
+  const handleDeepfakeSelect = (file) => {
+    setSelectedFile(file);
+    setSelectedUrl("");
+    detectDeepfakeAPI(file);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -354,7 +412,13 @@ const Combat = () => {
               />
             </div>
             <div className="-mt-5">
-              <FeatureCards onFileSelect={handleFileSelect} onUrlSelect={handleUrlSelect} />
+              <FeatureCards 
+                onFileSelect={handleFileSelect}
+                onVideoSelect={handleVideoSelect}
+                onImageUrlSelect={handleImageUrlSelect}
+                onVideoUrlSelect={handleVideoUrlSelect}
+                onDeepfakeSelect={handleDeepfakeSelect}
+              />
             </div>
           </div>
 
