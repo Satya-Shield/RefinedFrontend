@@ -112,7 +112,7 @@ const BackendResponse = ({ jsonResponse }) => {
             )}
 
             {/* Scrollable Response Card */}
-            <div className="w-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-70">
+            <div className="w-full pr-2 h-full">
                 <div
                     className={`${colorScheme.border} relative p-8 rounded-3xl border 
                     bg-gradient-to-b from-[#fffdf7] to-[#fef9ed] 
