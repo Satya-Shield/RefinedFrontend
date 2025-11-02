@@ -58,7 +58,7 @@ const BackendResponse = ({ jsonResponse }) => {
         if (jsonResponse[currentIndex]) {
             setConfidenceBar(0);
             const timer = setTimeout(() => {
-                const confidence = jsonResponse[currentIndex].confidence;
+                const confidence = jsonResponse[currentIndex].confidence_score;
                 // Convert decimal to percentage if needed (e.g., 0.75 -> 75)
                 const confidenceValue = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
                 setConfidenceBar(confidenceValue);
