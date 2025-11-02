@@ -21,7 +21,7 @@ const BackendResponse = ({ jsonResponse }) => {
     const getColorScheme = (response) => {
         if (!response) return null;
 
-        if (response.verdict === "True" && response.confidence >= 60) {
+        if (response.verdict === "True" && response.confidence_score >= 60) {
             return {
                 gradient: 'from-emerald-50 to-green-50',
                 border: 'border-gray-300',
@@ -31,7 +31,7 @@ const BackendResponse = ({ jsonResponse }) => {
                 textAccent: 'text-emerald-600',
                 progressBg: 'bg-emerald-500',
             };
-        } else if (response.verdict === "False" && response.confidence >= 60) {
+        } else if (response.verdict === "False" && response.confidence_score >= 60) {
             return {
                 gradient: 'from-red-900 to-rose-900',
                 border: 'border-gray-300',
