@@ -1,63 +1,103 @@
 import React, { useState } from 'react';
-import { FaImage, FaLink } from 'react-icons/fa';
+import { FaImage, FaLink, FaVideo } from 'react-icons/fa';
 
-const FeatureCard = ({ type, onFileSelect, onUrlSelect }) => {
+const FeatureCard = ({ type, onFileSelect, onUrlSelect, onVideoSelect }) => {
   const [file, setFile] = useState(null);
   const [url, setUrl] = useState('');
+  const [videoFile, setVideoFile] = useState(null);
 
   const cardConfig = {
     photo: {
-      icon: <FaImage className="w-7 h-7 text-white mb-3" />,
+      icon: <FaImage className="w-8 h-8 text-gray-800 mb-3" />,
       title: 'Add a photo to verify',
-      description: 'Upload an image that supports your claim.'
+      description: 'Upload an image that supports your claim.',
     },
     link: {
-      icon: <FaLink className="w-7 h-7 text-white mb-3" />,
+      icon: <FaLink className="w-8 h-8 text-gray-800 mb-3" />,
       title: 'Share a link to verify',
-      description: 'Paste a link related to your claim.'
-    }
+      description: 'Paste a link related to your claim.',
+    },
+    video: {
+      icon: <FaVideo className="w-8 h-8 text-gray-800 mb-3" />,
+      title: 'Add a video to verify',
+      description: 'Upload a video file that supports your claim.',
+    },
   };
 
   const handleFileChange = (e) => {
-    console.log(`selected file was ${e.target.files[0]}`);
-    console.log(e);
     const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    if (onFileSelect) onFileSelect(selectedFile);
+    if (selectedFile) {
+      setFile(selectedFile);
+      onFileSelect?.(selectedFile);
+    }
   };
 
   const handleUrlChange = (e) => {
-    console.log(`selected url was ${e.target.value}`);
-    console.log(e);
     const value = e.target.value;
     setUrl(value);
-    if (onUrlSelect) onUrlSelect(value);
+    onUrlSelect?.(value);
+  };
+
+  const handleVideoFileChange = (e) => {
+    const selectedVideoFile = e.target.files[0];
+    if (selectedVideoFile) {
+      setVideoFile(selectedVideoFile);
+      onVideoSelect?.(selectedVideoFile);
+    }
   };
 
   const config = cardConfig[type];
   if (!config) return null;
 
+  const CustomFileInput = ({ id, accept, onChange, selectedFile, buttonText }) => (
+    <div className="flex items-center mt-3">
+      <label
+        htmlFor={id}
+        className="px-4 py-2 bg-gradient-to-r from-red-900 to-blue-900 text-white text-sm font-medium rounded-l-lg cursor-pointer hover:opacity-90 transition-all duration-300"
+      >
+        {buttonText}
+      </label>
+      <input id={id} type="file" accept={accept} onChange={onChange} className="hidden" />
+      <span className="flex-grow px-3 py-2 text-sm text-gray-800 border border-l-0 border-gray-300 rounded-r-lg bg-white/60 backdrop-blur-sm truncate">
+        {selectedFile ? selectedFile.name : 'No file chosen'}
+      </span>
+    </div>
+  );
+
   return (
-    <div className="max-w-sm p-6 bg-gray-900/60 border border-gray-700 rounded-lg shadow-lg">
+    <div className="p-6 rounded-3xl bg-white/30 backdrop-blur-xl border border-gray-200/40 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       {config.icon}
-      <h5 className="mb-2 text-2xl font-semibold tracking-tight text-white">{config.title}</h5>
-      <p className="mb-3 font-normal text-gray-300">{config.description}</p>
+      <h5 className="mb-1 text-lg font-semibold text-gray-800">{config.title}</h5>
+      <p className="mb-3 text-sm text-gray-600">{config.description}</p>
 
       {type === 'photo' && (
-        <input
-          type="file"
+        <CustomFileInput
+          id="photo-upload"
           accept="image/*"
           onChange={handleFileChange}
-          className="text-white focus:ring-blue-600"
+          selectedFile={file}
+          buttonText="Choose File"
         />
       )}
+
       {type === 'link' && (
         <input
           type="text"
           placeholder="Enter the URL"
           value={url}
           onChange={handleUrlChange}
-          className="w-full p-2 rounded bg-black text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full p-3 -mt-9 bg-white/30 backdrop-blur-xl border border-gray-200/30 rounded-xl text-gray-800 placeholder:text-gray-500 shadow-md focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent transition-all duration-300 hover:shadow-lg"
+        />
+      )}
+
+
+      {type === 'video' && (
+        <CustomFileInput
+          id="video-upload"
+          accept="video/*"
+          onChange={handleVideoFileChange}
+          selectedFile={videoFile}
+          buttonText="Choose File"
         />
       )}
     </div>

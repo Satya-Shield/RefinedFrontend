@@ -247,7 +247,7 @@ const Combat = () => {
         <Navbar />
         <div className="w-full flex flex-col lg:flex-row lg:items-start gap-8 px-6 pt-12">
           <div className="flex flex-col space-y-6 lg:w-1/2 mt-0">
-            <div className="mt-0">
+            <div className="-mt-20">
               <SearchInput
                 onSearch={handleSearch}
                 loading={loading}
@@ -259,12 +259,12 @@ const Combat = () => {
                 onClearUrl={handleClearUrl}
               />
             </div>
-            <div className="mt-0">
+            <div className="-mt-5">
               <FeatureCards onFileSelect={handleFileSelect} onUrlSelect={handleUrlSelect} />
             </div>
           </div>
 
-          <div className="flex justify-center lg:justify-start lg:w-1/2 mt-0">
+          <div className="flex justify-center lg:justify-start lg:w-1/2 -mt-8">
             {jsonResponse && (
               <div className="mt-6">
                 <BackendResponse jsonResponse={jsonResponse} />
