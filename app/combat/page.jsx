@@ -42,24 +42,44 @@ const Combat = () => {
     }
   }, [searchParams]);
 
-  const saveHistory = async(respSave)=>{
-    if(!session){
+  const saveHistory = async (respSave) => {
+    if (!session) {
+      console.log('No session, skipping history save');
       return;
     }
-    try{
-      await fetch('/api/history',{
-      method : 'POST',
-      headers : {
-        'Content-Type' : 'application/json'
-      },
-      body : JSON.stringify(respSave)
-    });
-      console.log('History aayi hai');
-    }catch(error){
-      console.log('Nahi save hui history')
-    }
+    try {
+      const items = Array.isArray(respSave) ? respSave : [respSave];
+      let savedCount = 0;
+      for (const item of items) {
+        if (!item || !item.claim || !item.verdict) {
+          console.log('Invalid history item, skipping:', item?.claim || 'unknown');
+          continue;
+        }
 
-  }
+        const res = await fetch('/api/history', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include', // Critical: Include session cookies for auth
+          body: JSON.stringify(item)
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error(`Save failed for item "${item.claim}": ${res.status} - ${errorText}`);
+        } else {
+          console.log(`History saved for: "${item.claim}"`);
+          savedCount++;
+        }
+      }
+      if (savedCount > 0) {
+        console.log(`Successfully saved ${savedCount}/${items.length} history items`);
+      }
+    } catch (error) {
+      console.error('Failed to save history:', error);
+    }
+  };
 
   
   const verifyAPI = async (query) => {
