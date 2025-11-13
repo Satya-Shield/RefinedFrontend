@@ -94,7 +94,7 @@ const Combat = () => {
     console.log("Handling request for the basic query type");
     setLoading(true);
     try {
-      const res = await fetch("http://34.93.122.16:8000/api/run_agent", {
+      const res = await fetch("/api_bk/run_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
@@ -277,7 +277,7 @@ const Combat = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("http://34.93.122.16:8000/api/detect_deepfake", {
+      const res = await fetch("/api_bk/detect_deepfake", {
         method: "POST",
         body: formData,
       });
