@@ -94,7 +94,7 @@ const Combat = () => {
     console.log("Handling request for the basic query type");
     setLoading(true);
     try {
-      const res = await fetch("/api_bk/run_agent", {
+      const res = await fetch("/api/api_bk/run_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
@@ -133,7 +133,7 @@ const Combat = () => {
       formData.append("file", file);
       formData.append("query", query);
 
-      const res = await fetch("/api_bk/read_image_file", {
+      const res = await fetch("/api/api_bk/read_image_file", {
         method: "POST",
         body: formData,
       });
@@ -171,7 +171,7 @@ const Combat = () => {
       formData.append("file", file);
       formData.append("query", query);
 
-      const res = await fetch("/api_bk/read_video_file", {
+      const res = await fetch("/api/api_bk/read_video_file", {
         method: "POST",
         body: formData,
       });
@@ -205,7 +205,7 @@ const Combat = () => {
     console.log("Sending request for the url");
     setLoading(true);
     try {
-      const res = await fetch("/api_bk/read_image_url", {
+      const res = await fetch("/api/api_bk/read_image_url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, image: imageUrl }),
@@ -240,7 +240,7 @@ const Combat = () => {
     console.log("Sending request for the url for video");
     setLoading(true);
     try {
-      const res = await fetch("/api_bk/read_video_url", {
+      const res = await fetch("/api/api_bk/read_video_url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, video: videoUrl }),
@@ -277,7 +277,7 @@ const Combat = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api_bk/detect_deepfake", {
+      const res = await fetch("/api/api_bk/detect_deepfake", {
         method: "POST",
         body: formData,
       });
