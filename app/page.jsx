@@ -7,7 +7,6 @@ import SampleResponse from "@/components/SampleResponse";
 import AccessMethods from "@/components/AccessMethods";
 import Contributors from "@/components/Contributors";
 import Features from "@/components/Features";
-import AuthProvider from "@/components/AuthProvider";
 import connectDB from "@/config/database";
 const Page = async() => {
   await connectDB();
@@ -102,10 +101,8 @@ const Page = async() => {
 
       {/* Hero section content */}
       <div className="relative z-10">
-        <AuthProvider>
-          <Navbar/>
-          <Hero />
-        </AuthProvider>
+        <Navbar/>
+        <Hero />
 
         <BeforeAfterSection />
         <SampleResponse />

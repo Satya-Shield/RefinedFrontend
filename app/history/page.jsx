@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import BackendResponse from "@/components/BackendResponse";
-import AuthProvider from "@/components/AuthProvider";
 import { FaArrowLeft, FaArrowRight, FaExclamationTriangle } from "react-icons/fa";
 
 const HistoryPage = () => {
@@ -13,33 +12,33 @@ const HistoryPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { data: session, status } = useSession();
+  const { isSignedIn, user, isLoaded } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.push("/");
       return;
     }
 
-    if (status === "authenticated") {
-      const fetchHistory = async () => {
-        try {
-          const res = await fetch("/api/history", { credentials: "include" });
-          if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-          const data = await res.json();
-          setHistory(data || []);
-          if (data?.length > 0) setCurrentIndex(0);
-        } catch (err) {
-          console.error("Failed to fetch history:", err);
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchHistory();
-    }
-  }, [status, router]);
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch("/api/history", { credentials: "include" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+        const data = await res.json();
+        setHistory(data || []);
+        if (data?.length > 0) setCurrentIndex(0);
+      } catch (err) {
+        console.error("Failed to fetch history:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistory();
+  }, [isSignedIn, isLoaded, router]);
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? history.length - 1 : prev - 1));
@@ -51,7 +50,7 @@ const HistoryPage = () => {
 
   const handleItemClick = (index) => setCurrentIndex(index);
 
-  if (loading || status === "loading")
+  if (loading || !isLoaded)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-100 via-amber-50 to-amber-25">
         <p className="text-gray-600">Loading your history...</p>
@@ -120,9 +119,7 @@ const HistoryPage = () => {
 
       {/* Content */}
       <div className="relative z-10">
-        <AuthProvider>
-          <Navbar />
-        </AuthProvider>
+        <Navbar />
 
         <div className="w-full flex flex-col lg:flex-row lg:items-start gap-10 px-6 pt-12 max-w-7xl mx-auto">
           {/* Left side */}

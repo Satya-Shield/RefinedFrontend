@@ -1,16 +1,17 @@
 import "./globals.css";
 import Page from './page'
-import AuthProvider from "@/components/AuthProvider";
+import { ClerkProvider } from '@clerk/nextjs';
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
-        <AuthProvider>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
           <div>
             {children}
           </div>
-        </AuthProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -1,21 +1,21 @@
-import { SessionProvider } from "next-auth/react";
-import Navbar from "@/components/Navbar"; // adjust path as needed
+import { ClerkProvider } from '@clerk/nextjs';
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata = {
-  title: "Your App",
-  description: "Your description",
+  title: "SatyaShield",
+  description: "Your secure authentication platform",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
-        <SessionProvider>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
           <Navbar />
           {children}
-        </SessionProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

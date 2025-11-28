@@ -1,28 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
-  const [providers, setProviders] = useState(null);
+  const { isSignedIn, user, isLoaded } = useUser();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const setAuthProviders = async () => {
-      try {
-        const res = await getProviders();
-        setProviders(res);
-      } catch (error) {
-        console.error("Failed to load providers:", error);
-      }
-    };
-    setAuthProviders();
-  }, []);
-
-  if (status === "loading") {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
@@ -66,7 +52,7 @@ const Navbar = () => {
         </div>
 
         {/* Auth Buttons */}
-        {session ? (
+        {isSignedIn ? (
           <div className="flex items-center space-x-3">
             <button
               onClick={() => (window.location.href = "/history")}
@@ -74,29 +60,18 @@ const Navbar = () => {
             >
               User History
             </button>
-            <button
-              onClick={() => signOut()}
-              className="flex items-center px-4 py-2 font-semibold text-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md bg-gradient-to-r from-red-900 to-blue-900 border border-transparent"
-            >
-              Sign Out
-            </button>
+            <SignOutButton>
+              <button className="flex items-center px-4 py-2 font-semibold text-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md bg-gradient-to-r from-red-900 to-blue-900 border border-transparent">
+                Sign Out
+              </button>
+            </SignOutButton>
           </div>
         ) : (
-          <div className="flex items-center">
-            {providers ? (
-              Object.values(providers).map((provider) => (
-                <button
-                  key={provider.name}
-                  onClick={() => signIn(provider.id)}
-                  className="flex items-center px-4 py-2 font-semibold text-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md bg-gradient-to-r from-red-900 to-blue-900 border border-transparent"
-                >
-                  Sign Up / Login
-                </button>
-              ))
-            ) : (
-              <div>Loading providers...</div>
-            )}
-          </div>
+          <SignInButton mode="modal">
+            <button className="flex items-center px-4 py-2 font-semibold text-white rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:shadow-md bg-gradient-to-r from-red-900 to-blue-900 border border-transparent">
+              Sign Up / Login
+            </button>
+          </SignInButton>
         )}
       </nav>
     </div>

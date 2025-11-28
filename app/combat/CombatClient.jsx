@@ -5,11 +5,11 @@ import SearchInput from "@/components/SearchInput";
 import BackendResponse from "@/components/BackendResponse";
 import FeatureCards from "@/components/FeatureCards";
 import { useSearchParams } from "next/navigation"; 
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { FaShieldAlt } from "react-icons/fa";
 const Combat = () => {
   const searchParams = useSearchParams();
-  const { data : session } = useSession();
+  const { isSignedIn, user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -42,8 +42,8 @@ const Combat = () => {
   }, [searchParams]);
 
   const saveHistory = async (respSave) => {
-    if (!session) {
-      console.log('No session, skipping history save');
+    if (!isSignedIn) {
+      console.log('Not signed in, skipping history save');
       return;
     }
     try {
