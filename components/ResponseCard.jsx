@@ -22,7 +22,12 @@ const ResponseCard = ({
   const techniques = response.techniques || [];
   const sources = response.sources || [];
   const checklist = response.checklist || [];
-  const confidenceBar = response.confidence || 0;
+  
+  // Support both field names and handle different formats
+  const rawConfidence = response.confidence_score || response.confidence || 0;
+  const confidenceBar = rawConfidence <= 1 
+    ? Math.round(rawConfidence * 100) 
+    : Math.round(rawConfidence);
 
   return (
     <div

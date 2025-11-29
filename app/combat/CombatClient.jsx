@@ -82,11 +82,17 @@ const Combat = () => {
 
   const formatApiResponse = (data) => {
     const items = Array.isArray(data) ? data : [data];
-    return items.map(item => ({
-      ...item,
-      // ✨ MODIFIED: Round down the confidence score if it exists, otherwise default to 0.
-      confidence: 100,
-    }));
+    return items.map(item => {
+      const rawConfidence = item.confidence_score || item.confidence || 0;
+      
+      const roundedConfidence = Math.round(rawConfidence);
+      
+      return {
+        ...item,
+        confidence_score: roundedConfidence, 
+        confidence: roundedConfidence, 
+      };
+    });
   };
 
   
@@ -425,43 +431,15 @@ const Combat = () => {
           <div className="flex justify-center lg:justify-start flex-1">
             {jsonResponse && (
               <div className="-mt-8 w-full space-y-6">
-                {/* 🟩 Overall Verdict + Summary Section */}
-                {jsonResponse.verdict !== undefined && (
-                  <div className="relative p-3 rounded-lg border border-[#ede8da] bg-gradient-to-b from-[#fffdf7] to-[#fef9ed] shadow-sm w-full backdrop-blur-md">
-                    {/* Top Row: Verdict */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <FaShieldAlt className="text-gray-700 text-lg flex-shrink-0" />
-                      <h2 className="text-sm font-semibold text-gray-800">
-                        Overall Verdict:{" "}
-                        <span
-                          className={`${
-                            jsonResponse.verdict
-                              ? "text-green-600"
-                              : jsonResponse.verdict === false
-                              ? "text-red-600"
-                              : "text-yellow-500"
-                          }`}
-                        >
-                          {jsonResponse.verdict === true
-                            ? "True"
-                            : jsonResponse.verdict === false
-                            ? "False"
-                            : "Uncertain"}
-                        </span>
-                      </h2>
-                    </div>
-                    {/* Summary Box - Shows 2 lines, rest scrollable */}
-                    <div className="bg-white/50 rounded-lg border border-gray-200/60 p-2 text-gray-700 text-xs leading-relaxed backdrop-blur-sm overflow-y-auto" style={{ maxHeight: '5rem' }}>
-                      {jsonResponse.summary || "No summary available."}
-                    </div>
-                  </div>
-                )}
-
-                {/* 🟦 Individual Claim Responses (Existing Layout) */}
+                {/* Individual Claim Responses */}
                 {jsonResponse.claims ? (
-                  <BackendResponse jsonResponse={jsonResponse.claims} />
+                  <BackendResponse 
+                    jsonResponse={jsonResponse.claims} 
+                  />
                 ) : (
-                  <BackendResponse jsonResponse={jsonResponse} />
+                  <BackendResponse 
+                    jsonResponse={jsonResponse}
+                  />
                 )}
               </div>
             )}

@@ -86,7 +86,6 @@ const HistoryPage = () => {
       </div>
     );
 
-  // ✅ Safety check to ensure currentHistoryItem is always valid
   const currentHistoryItem =
     Array.isArray(history[currentIndex]) && history[currentIndex].length > 0
       ? history[currentIndex]

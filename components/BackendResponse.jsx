@@ -18,10 +18,10 @@ const BackendResponse = ({ jsonResponse }) => {
 
     if (!jsonResponse || jsonResponse.length === 0) return null;
 
-    const getColorScheme = (response) => {
-        if (!response) return null;
+    const getColorScheme = (claim) => {
+        if (!claim) return null;
 
-        if (response.verdict === "True" && response.confidence_score >= 60) {
+        if (claim.verdict === "True") {
             return {
                 gradient: 'from-emerald-50 to-green-50',
                 border: 'border-gray-300',
@@ -31,7 +31,7 @@ const BackendResponse = ({ jsonResponse }) => {
                 textAccent: 'text-emerald-600',
                 progressBg: 'bg-emerald-500',
             };
-        } else if (response.verdict === "False" && response.confidence_score >= 60) {
+        } else if (claim.verdict === "False") {
             return {
                 gradient: 'from-red-900 to-rose-900',
                 border: 'border-gray-300',
@@ -58,9 +58,14 @@ const BackendResponse = ({ jsonResponse }) => {
         if (jsonResponse[currentIndex]) {
             setConfidenceBar(0);
             const timer = setTimeout(() => {
-                const confidence = jsonResponse[currentIndex].confidence_score;
-                // Convert decimal to percentage if needed (e.g., 0.75 -> 75)
-                const confidenceValue = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+                const confidence = jsonResponse[currentIndex].confidence_score || 
+                                 jsonResponse[currentIndex].confidence || 0;
+                
+               
+                const confidenceValue = confidence <= 1 
+                    ? Math.round(confidence * 100) 
+                    : Math.round(confidence);
+                
                 setConfidenceBar(confidenceValue);
             }, 100);
             return () => clearTimeout(timer);
@@ -88,30 +93,6 @@ const BackendResponse = ({ jsonResponse }) => {
 
     return (
         <div className="relative flex flex-col items-center w-full mx-auto">
-            
-            {/* Navigation Controls */}
-            {jsonResponse.length > 1 && (
-                <div className="flex items-center justify-between w-full mb-4 px-4 flex-shrink-0">
-                    <button
-                        onClick={handlePrev}
-                        className="flex items-center justify-center w-10 h-10 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
-                    >
-                        <FaArrowLeft className="w-4 h-4" />
-                    </button>
-                    
-                    <div className="text-gray-600 text-sm font-medium">
-                        {currentIndex + 1} / {jsonResponse.length}
-                    </div>
-                    
-                    <button
-                        onClick={handleNext}
-                        className="flex items-center justify-center w-10 h-10 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-md"
-                    >
-                        <FaArrowRight className="w-4 h-4" />
-                    </button>
-                </div>
-            )}
-
             {/* Response Card */}
             <div className="w-full pr-2">
                 <div
@@ -120,6 +101,28 @@ const BackendResponse = ({ jsonResponse }) => {
                     shadow-[0_4px_25px_rgba(0,0,0,0.07)] border-[#ede8da] 
                     w-full backdrop-blur-md`}
                 >
+                    {/* Navigation Controls - Top Right */}
+                    {jsonResponse.length > 1 && (
+                        <div className="absolute top-4 right-4 flex items-center gap-3">
+                            <button
+                                onClick={handlePrev}
+                                className="flex items-center justify-center w-8 h-8 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-sm"
+                            >
+                                <FaArrowLeft className="w-3 h-3" />
+                            </button>
+                            
+                            <div className="text-gray-600 text-sm font-medium">
+                                {currentIndex + 1} / {jsonResponse.length}
+                            </div>
+                            
+                            <button
+                                onClick={handleNext}
+                                className="flex items-center justify-center w-8 h-8 bg-white/60 backdrop-blur-xl hover:bg-white/80 border border-gray-300/40 rounded-lg text-gray-700 transition-all duration-200 shadow-sm"
+                            >
+                                <FaArrowRight className="w-3 h-3" />
+                            </button>
+                        </div>
+                    )}
 
                     <div className="relative space-y-4">
                         {/* Claim Header */}

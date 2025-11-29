@@ -1,6 +1,10 @@
+// Use environment variable for backend URL, fallback to localhost
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
+
 export async function POST(req, { params }) {
-  const path = params.path.join("/");
-  const backendURL = `http://34.93.122.16:8000/api/${path}`;
+  // Next.js 15 requires awaiting params
+  const { path } = await params;
+  const backendURL = `${BACKEND_BASE_URL}/api/${path.join("/")}`;
 
   try {
     const body = await req.text(); // get the raw request body
@@ -31,8 +35,9 @@ export async function POST(req, { params }) {
 }
 
 export async function GET(req, { params }) {
-  const path = params.path.join("/");
-  const backendURL = `http://34.93.122.16:8000/api/${path}`;
+  // Next.js 15 requires awaiting params
+  const { path } = await params;
+  const backendURL = `${BACKEND_BASE_URL}/api/${path.join("/")}`;
 
   try {
     const response = await fetch(backendURL);
