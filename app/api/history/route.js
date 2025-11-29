@@ -15,10 +15,28 @@ export const GET = async (request) => {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // 2. Find the user in our database by clerkId
-    const user = await User.findOne({ clerkId: clerkUser.id });
+    // 2. Find the user in our database by clerkId, or create/update if needed
+    let user = await User.findOne({ clerkId: clerkUser.id });
+
     if (!user) {
-      return new NextResponse('User not found', { status: 404 });
+      // Try finding by email in case user exists with old clerkId
+      user = await User.findOne({ email: clerkUser.emailAddresses[0]?.emailAddress });
+
+      if (user) {
+        // Update the clerkId if user exists with different clerkId
+        user.clerkId = clerkUser.id;
+        await user.save();
+        console.log('Updated user clerkId:', user.email);
+      } else {
+        // Create new user if doesn't exist at all
+        user = await User.create({
+          clerkId: clerkUser.id,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          username: clerkUser.username || clerkUser.emailAddresses[0]?.emailAddress.split('@')[0] || 'user',
+          image: clerkUser.imageUrl || '',
+        });
+        console.log('Auto-created user:', user.email);
+      }
     }
 
     // 3. Find all history records for that user and sort by newest first
@@ -43,10 +61,28 @@ export const POST = async (request) => {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // 2. Find the user in our database by clerkId
-    const user = await User.findOne({ clerkId: clerkUser.id });
+    // 2. Find the user in our database by clerkId, or create/update if needed
+    let user = await User.findOne({ clerkId: clerkUser.id });
+
     if (!user) {
-      return new NextResponse('User not found', { status: 404 });
+      // Try finding by email in case user exists with old clerkId
+      user = await User.findOne({ email: clerkUser.emailAddresses[0]?.emailAddress });
+
+      if (user) {
+        // Update the clerkId if user exists with different clerkId
+        user.clerkId = clerkUser.id;
+        await user.save();
+        console.log('Updated user clerkId:', user.email);
+      } else {
+        // Create new user if doesn't exist at all
+        user = await User.create({
+          clerkId: clerkUser.id,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          username: clerkUser.username || clerkUser.emailAddresses[0]?.emailAddress.split('@')[0] || 'user',
+          image: clerkUser.imageUrl || '',
+        });
+        console.log('Auto-created user:', user.email);
+      }
     }
 
     // 3. Get the data from the request body

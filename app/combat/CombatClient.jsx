@@ -111,7 +111,8 @@ const Combat = () => {
       const data = await res.json();
       console.log(data);
       setJsonResponse(data);
-      await saveHistory(data);
+      // Save the claims array if it exists, otherwise save the data as is
+      await saveHistory(data.claims || data);
     } catch (err) {
       console.error("Error hai code mei:", err);
       setJsonResponse([
@@ -149,7 +150,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From image verification", data);
       setJsonResponse(data);
-      await saveHistory(data);
+      await saveHistory(data.claims || data);
     } catch (err) {
       console.error("From image verification", err);
       setJsonResponse([
@@ -187,7 +188,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From video verification", data);
       setJsonResponse(data);
-      await saveHistory(data);
+      await saveHistory(data.claims || data);
     } catch (err) {
       console.error("From video verification", err);
       setJsonResponse([
@@ -222,7 +223,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From url results", data);
       setJsonResponse(data);
-      await saveHistory(data)
+      await saveHistory(data.claims || data)
     } catch (err) {
       console.error("Error in URL verification", err);
       setJsonResponse([
@@ -257,7 +258,7 @@ const Combat = () => {
       const data = await res.json();
       console.log("From url results", data);
       setJsonResponse(data);
-      await saveHistory(data)
+      await saveHistory(data.claims || data)
     } catch (err) {
       console.error("Error in video URL verification", err);
       setJsonResponse([
