@@ -7,11 +7,24 @@ export async function POST(req, { params }) {
   const backendURL = `${BACKEND_BASE_URL}/api/${path.join("/")}`;
 
   try {
-    const body = await req.text(); // get the raw request body
+    const contentType = req.headers.get("content-type") || "";
+    let body;
+    let headers = {};
+
+    // Handle multipart/form-data (file uploads)
+    if (contentType.includes("multipart/form-data")) {
+      // For FormData, we need to get the FormData object and forward it
+      body = await req.formData();
+      // Don't set Content-Type header - fetch will set it with the boundary
+    } else {
+      // Handle JSON requests
+      body = await req.text();
+      headers["Content-Type"] = "application/json";
+    }
 
     const response = await fetch(backendURL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body,
     });
 

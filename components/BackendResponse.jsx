@@ -18,6 +18,25 @@ const BackendResponse = ({ jsonResponse }) => {
 
     if (!jsonResponse || jsonResponse.length === 0) return null;
 
+    // Sanitize response data to handle backend issues (e.g., np.float64)
+    const sanitizeResponse = (response) => {
+        if (!response) return null;
+        
+        return {
+            ...response,
+            verdict: response.verdict === false || response.verdict === 'false' ? 'False' : 
+                     response.verdict === true || response.verdict === 'true' ? 'True' : 
+                     String(response.verdict || 'Unknown'),
+            claim: String(response.claim || 'No claim provided'),
+            explanation: String(response.explanation || 'No explanation available'),
+            confidence_score: typeof response.confidence_score === 'number' ? response.confidence_score : 
+                            typeof response.confidence === 'number' ? response.confidence : 0,
+            techniques: Array.isArray(response.techniques) ? response.techniques : [],
+            sources: Array.isArray(response.sources) ? response.sources : [],
+            checklist: Array.isArray(response.checklist) ? response.checklist : [],
+        };
+    };
+
     const getColorScheme = (claim) => {
         if (!claim) return null;
 
@@ -84,8 +103,28 @@ const BackendResponse = ({ jsonResponse }) => {
         );
     };
 
-    const response = jsonResponse[currentIndex];
+    const response = sanitizeResponse(jsonResponse[currentIndex]);
+    
+    // Safety check
+    if (!response) {
+        return (
+            <div className="text-center p-8 text-red-600">
+                Error: Invalid response data
+            </div>
+        );
+    }
+    
     const colorScheme = getColorScheme(response);
+    
+    // Additional safety check for colorScheme
+    if (!colorScheme) {
+        return (
+            <div className="text-center p-8 text-red-600">
+                Error: Unable to determine verdict color scheme
+            </div>
+        );
+    }
+    
     const IconComponent = colorScheme.icon;
     const techniques = response.techniques || [];
     const sources = response.sources || [];
